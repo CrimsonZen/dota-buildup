@@ -3513,6 +3513,7 @@ $(document).ready(function () {
     }
     layer.add(cd.item_group);
     document.addEventListener("mousewheel", zoom, false);
+    document.addEventListener("DOMMouseScroll", zoom, false);
     // add the layer to the stage
     stage.add(layer);
 });
