@@ -151,7 +151,7 @@ var all_items = {
     "12": {
         "name": "ring_of_protection",
         "localized_name": "Ring of Protection",
-        "cost": 1750,
+        "cost": 175,
         "aliases": [
             "rop"
         ],
