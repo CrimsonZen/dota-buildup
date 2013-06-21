@@ -1,3 +1,4 @@
+// Based off https://github.com/adamrezich/dotabutt/blob/master/data/items.json
 var all_items = {
     "1": {
         "name": "blink",
