@@ -1512,7 +1512,7 @@ var all_items = {
     "103": {
         "name": "recipe_dagon",
         "localized_name": "Recipe: Dagon",
-        "cost": 1300,
+        "cost": 1250,
         "recipe": 1
     },
     "104": {
@@ -3447,7 +3447,9 @@ var zoom = function(evt) {
         cd.stage.setScale(newscale);
         cd.item_group.getChildren().each(function (shape, n) {
             shape.setScale(itemscale);
+
         });
+        cd.tooltip_layer.getChildren()[0].setScale(itemscale);
         cd.stage.draw();
 
         cd.item_scale = itemscale;
@@ -3457,13 +3459,40 @@ var zoom = function(evt) {
 $(document).ready(function () {
     var stage = new Kinetic.Stage({
         container: 'chart',
-        width: '1400',
-        height: '900'
+        width: '3000',
+        height: '3000'
     });
     cd.stage = stage
 
     var layer = new Kinetic.Layer();
     layer.setDraggable("draggable");
+
+    var tooltip_layer = cd.tooltip_layer = new Kinetic.Layer();
+
+    var tooltip = new Kinetic.Label({
+        opacity: 0.75,
+        visible: false,
+        listening: false,
+    });
+    tooltip.add(new Kinetic.Tag({
+        fill: 'black',
+        pointerDirection: 'down',
+        pointerWidth: 10,
+        pointerHeight: 10,
+        lineJoin: 'round',
+        shadowColor: 'black',
+        shadowBlur: 10,
+        shadowOffset: 10,
+        shadowOpacity: 0.2
+    }));
+    tooltip.add(new Kinetic.Text({
+        text: '',
+        fontFamily: 'Calibri',
+        fontSize: 18,
+        padding: 5,
+        fill: 'white'
+    }));
+    tooltip_layer.add(tooltip);
 
     var dragtangle = new Kinetic.Rect({
         x: -3000,
@@ -3480,11 +3509,12 @@ $(document).ready(function () {
         var item = base_items[k];
         var text = new Kinetic.Text({
             x: item.cost / 6000.0 * stage.getWidth(),
-            y: item.build_cost / 4000.0 * stage.getHeight() + k % 15,
+            y: item.build_cost / 4000.0 * stage.getHeight() + (k % 20 - 10),
             text: item.localized_name,
             fontSize: 12,
             fontFamily: 'Arial',
-            fill: item.recipe ? 'orange': 'green'
+            fill: item.recipe ? 'orange': 'green',
+            id: k
         });
         cd.item_group.add(text);
     }
@@ -3513,8 +3543,27 @@ $(document).ready(function () {
         cd.item_group.add(text);
     }
     layer.add(cd.item_group);
+    layer.add(tooltip);
     document.addEventListener("mousewheel", zoom, false);
     document.addEventListener("DOMMouseScroll", zoom, false);
+
+    cd.item_group.on('mouseover mousemove', function(evt) {
+        var node = evt.targetNode;
+        var item = base_items[node.getId()];
+        // update tooltip
+        var mousePos = node.getStage().getMousePosition();
+        console.log(node);
+        console.log(item);
+        tooltip.getText().setText(item.localized_name + ': ' + item.cost + " (" + item.build_cost + ")");
+        tooltip.setPosition(node.getX() + (node.getWidth() / 2) * node.getScaleX(), node.getY());
+        tooltip.show();
+        layer.draw();
+    }); 
+
+    cd.item_group.on('mouseout dragmove', function(evt) {
+        tooltip.hide();
+        layer.draw();
+    });
     // add the layer to the stage
-    stage.add(layer);
+    cd.stage.add(layer);
 });
